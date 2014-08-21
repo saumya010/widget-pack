@@ -1,0 +1,72 @@
+.sidebar-padder{
+    border:1px solid #003CFF;
+    border-radius:20px;
+}
+.widget{
+    padding-left:5%;
+    padding-right:5%;
+}
+.line-space{
+    line-height:2em;
+}
+.featured-image img{
+   width:250px;
+   height:150px;
+   border:2px solid #000;
+}
+.author-gravatar{
+    padding-top:5px;
+}
+.author-gravatar img{
+   border:1px solid #000;
+}
+
+h4{
+    text-decoration:underline;
+}
+
+.list li{
+    list-style:none;
+}
+.auth-wid a{
+    text-transform:uppercase;
+}
+.post-title a{
+    font-size:20px;
+}
+.post-by{
+    text-transform:uppercase;
+    padding-top:10px;
+    padding-bottom:10px;
+}
+.avtar{
+    margin:4px 0 2px 0;
+    height:50px;
+    width:50px;
+}
+.post-date{
+    padding-top:5px;
+}
+.count{
+    padding-top:10px;
+}
+.post-excerpt{
+    padding-top:10px;    
+}
+.post-comment{
+    float:right;
+    width:80%;
+}
+.post-comm-avatar{
+    float:left;
+    width:20%;
+}
+.recentcomments{
+    padding:5px 0px;
+}
+.text{
+    clear:both;
+}
+.post-categories li{
+    list-style:square;
+}
