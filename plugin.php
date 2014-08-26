@@ -1,6 +1,6 @@
 <?php
    /*
-   Plugin Name: Widget Pack
+   Plugin Name: Advance Widget Pack
    Plugin URI: http://www.ideaboxthemes.com
    Description: A plugin to display author bio, author list, popular post, featured posts, recent posts and recent comments.
    Version: 1.0
