@@ -17,29 +17,12 @@ function ab_get_author_list($noauth,$exc){
     wp_list_authors(array('number'=>$noauth,'exclude'=>$exc));
     echo "</ul>";
 }
-function catch_that_image() {
-  		global $post, $posts;
-  		$first_img = '';
-                $matches[1][0] = ''; 
-  		ob_start();
-  		ob_end_clean();
-  		if($output = preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $post->post_content, $matches)) {
-                    $first_img = $matches[1][0];
-                }
-  		if(empty($first_img)){ //Defines a default image
-                    $first_img= "http://www.hdwallpapersfootball.com/wp-content/uploads/2014/06/Manchester-United-FC-Logo-HD-Wallpaper.jpg";                    
-  		}
-  		return $first_img;
-}
 function display_featured_image(){    
     global $post;
     $post_id=$post->ID;
     if ( has_post_thumbnail($post_id) ) {
         the_post_thumbnail('featured-thumb');
-    }
-    else {
-       // echo '<img src="'.catch_that_image().'"alt="sorry could not load the image/>';
-    }    
+    }   
 }
 function display_post_author_name(){
     global $post;
