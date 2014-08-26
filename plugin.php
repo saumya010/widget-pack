@@ -11,12 +11,7 @@
    */
 ?>
 <?php
-function widplg_enqueue_style(){
-   wp_register_style( 'style', plugins_url( 'style.css', __FILE__ ) );
-   wp_enqueue_style( 'style',plugins_url( 'style.css', __FILE__ ) );
-}
-add_action('wp_enqueue_scripts', 'widplg_enqueue_style');
-add_action('wp_head', 'wp_add_view');
+add_action('wp_head', 'awp_add_view');
 function ab_get_author_list($noauth,$exc){
     echo "<ul>";
     wp_list_authors(array('number'=>$noauth,'exclude'=>$exc));
@@ -58,7 +53,7 @@ function display_author_description($post_id=0){
         $auth_id=$post->post_author;
         echo get_the_author_meta( 'description', $auth_id);
 }
-function wp_add_view(){
+function awp_add_view(){
     if(is_single()){
         global $post;    
         $current_views=get_post_meta($post->ID, "wp_views", true);
@@ -70,7 +65,7 @@ function wp_add_view(){
         return $new_views;
     }
 }
-function wp_get_view_count() {
+function awp_get_view_count() {
     global $post;            
     $current_views = get_post_meta($post->ID, "wp_views", true);
     if(!isset($current_views) OR empty($current_views) OR !is_numeric($current_views) ) {
