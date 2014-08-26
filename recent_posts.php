@@ -1,25 +1,27 @@
 <?php
-class wp_recent_posts extends WP_Widget {
+class awp_recent_posts extends WP_Widget {
     function __construct() {
-        parent::__construct(
-            // Base ID of your widget
-            'wp_recent_posts', 
-            // Widget name will appear in UI
-            __('Recent Posts', 'wp_widget_plugin'), 
-            // Widget description
-            array( 'description' => __( 'Widget to display recent posts', 'wp_widget_plugin' ),'classname'=> 'recent_posts_widget' ) 
-        );
+        $widget_ops = array(
+			'classname'   => 'awp_recent_posts',
+			'description' => __( 'Widget to display recent posts.', 'awp_domain' ),
+		);
+		$control_ops = array(
+			'id_base' => 'awp_recent_posts',
+			'width'   => 200,
+			'height'  => 250,
+		);
+		parent::__construct( 'awp_recent_posts', __( 'Recent Posts', 'awp_domain' ), $widget_ops, $control_ops );
     }
     public function widget( $args, $instance ) {
         $title = apply_filters( 'widget_title', $instance['title'] );
         $post_count = $instance['post_count'];
         // before and after widget arguments are defined by themes
         
-        echo '<div id="recent-posts" class="widget">';
+        echo $args['before_widget'];        
         if ( ! empty( $title ) )
-            echo "<h3 class='widget-title'>" . $title  . "</h3>";
+            echo $args['before_title']. $title. $args['after_title'];
         
-        $args = new WP_Query(
+        $arg = new WP_Query(
             array(
                 "posts_per_page" => $post_count,
                 "post_type" => "post",
@@ -28,50 +30,49 @@ class wp_recent_posts extends WP_Widget {
             )
         );
         global $post;                   
-        if($args->have_posts()) { echo '<ul class="list">'; }
-        while ( $args->have_posts() ) : $args->the_post();
-            echo'<li class="widget-list-item">';
+        if($arg->have_posts()) { echo '<ul class="awp-list">'; }
+        while ( $arg->have_posts() ) : $arg->the_post();
+            echo'<li class="awp-post-item">';
                 echo '<h4 class="post-title"><a href="'.get_permalink($post->ID).'">'.the_title('', '', false).'</a></h4>';
                 if($instance['show_image']){
                     echo '<div class="featured-image">';
                         display_featured_image();
                     echo '</div>';
                 }
-                echo "<div class='details'>";
+                    if($instance['show_date'] || $instance['show_author'] )
+                    {
+                        echo '<div class="post-meta">';
+                    }
                     if($instance['show_date']){
-                        echo "<p><strong>Date:</strong>";
+                        echo "On: ";
                         echo the_date('','','',true);
-                        echo "</p>";
                     }
                     if($instance['show_author']){
-                        echo "<p>";
+                        echo " By: ";
                         display_post_author_name();
-                        echo "</p>";
+                    }
+                     if($instance['show_date'] || $instance['show_author'] )
+                    {
+                        echo '</div>';
                     }
                     if($instance['show_category']){
-                        echo "<p><strong>Category:</strong>";
-                        get_the_category_list();
-                        echo "</p>";
+                        echo get_the_category_list();
                     }
                     if($instance['show_comment_number']){
-                        echo "<p>";
                         comments_number();
-                        echo "</p>";
                     }
                     if($instance['show_excerpt']){
-                        echo "<p><strong>Excerpt:</strong>";
                         the_excerpt();
                         echo "</p>";
-                    }
-                echo "</div>";
+                    }                    
             echo "</li>";
         endwhile;
         echo "</ul>";        
-        echo '</div>';
+        echo $args['after_widget'];
     }
 		
     public function form( $instance ) {
-        $defaults = array( 'title' => __('Recent Posts'), 'post_count' => __('5'), 'show_image' => __('0')
+        $defaults = array( 'title' => __('Recent Posts'), 'post_count' => '5', 'show_image' => __('0')
             , 'show_date' => __('0'), 'show_author' => __('0'), 'show_category' => __('0')
             , 'show_comment_number' => __('0'), 'show_excerpt' => __('0'), 'read_more' => __('Read More..'));
 	$instance = wp_parse_args( (array) $instance, $defaults );
@@ -109,7 +110,7 @@ class wp_recent_posts extends WP_Widget {
         </p>
         <p>
             <input class="checkbox" type="checkbox" <?php checked($instance['show_excerpt'], 'on'); ?> id="<?php echo $this->get_field_id('show_excerpt'); ?>" name="<?php echo $this->get_field_name('show_excerpt'); ?>" /> 
-            <label for="<?php echo $this->get_field_id('show_excerpt'); ?>">Display Post Excerpt with Read More link</label>
+            <label for="<?php echo $this->get_field_id('show_excerpt'); ?>">Display Post Excerpt</label>
         </p>
         
 	<p>
@@ -133,10 +134,4 @@ class wp_recent_posts extends WP_Widget {
         return $instance;
     }
 } 
-
-// Register and load the widget
-function wp_load_widget() {
-	register_widget( 'wp_recent_posts' );
-}
-add_action( 'widgets_init', 'wp_load_widget' );
 ?>

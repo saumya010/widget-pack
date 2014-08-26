@@ -2,8 +2,8 @@
 class Post_Stats_Counter extends WP_Widget {
 	// Controller
 	function __construct() {
-	$widget_ops = array('classname' => 'widget_class', 'description' => __('Insert the plugin description here'));
-	$control_ops = array('width' => 300, 'height' => 300);
+	$widget_ops = array('classname' => 'widget_class', 'description' => __('Widget to display popular posts'));
+	$control_ops = array('width' => 200, 'height' => 250);
 	parent::WP_Widget(false, $name = __('Popular Posts'), $widget_ops, $control_ops );
 ?>
 <?php
@@ -85,9 +85,9 @@ class Post_Stats_Counter extends WP_Widget {
         $post_count= apply_filters('widget_title', $instance['post_count']);
         global $author_id;
         // Display the widget title
-        echo "<div class='auth-widget widget'>";
+        echo $args['before_widget'];
             if ( $title ){
-                echo "<h3 class='widget-title'>".$title."</h3>";}
+                echo $args['before_title'] .$title. $args['after_title'];}
             if($instance['sort_radio']=="comments") {  
                 $args = array(
                     'author'=>$author_id,
@@ -98,38 +98,42 @@ class Post_Stats_Counter extends WP_Widget {
                     "order" => "DESC"
                 );
             $asc_list = new WP_Query($args);
-            if($asc_list->have_posts()) { echo "<ul class='list'>"; }
+            if($asc_list->have_posts()) { echo "<ul class='awp-list'>"; }
                 while ( $asc_list->have_posts() ) : $asc_list->the_post();                    
                     echo '<li><h4 class="post-title"><a href="'.get_permalink().'">'.the_title('', '', false)."</h4>";
                             if($instance['featured-image']){
                                 echo"<div class='featured-image'>";
-                                    if (has_post_thumbnail()){
-                                        the_post_thumbnail('featured-thumb');
+                                    if(has_post_thumbnail())
+                                        the_post_thumbnail();
+                                    else {
+                                        echo "No image found";
                                     }
-                                    else{
-                                        echo '<img src="';
-                                        echo catch_that_image();
-                                        echo '"alt="Image Not Found"';
-                                        echo the_title();
-                                        echo '/>';
-                                    } 
                                 echo"</div>";
                             }
                     echo '</a>';
+                    if($instance['post-date']||$instance['post-author']){
+                        echo"<div class='post-meta'>";
+                    }
                     if ($instance['post-date']){
                         echo"<div class='post-date'>";
-                            echo"Posted On:";
+                            echo"Posted On: ";
                             echo get_the_date();
                         echo"</div>";
                     }          
-                    if(function_exists("display_post_author_name")){
-                        echo "<div class = 'post-by'>";
-                            if($instance['post-author']){                        
+                    if(function_exists("display_post_author_name")){                        
+                        if($instance['post-author']){           
+                            echo "<div class = 'post-by'>";
                                 display_post_author_name();
-                                    echo"<div class='author-gravatar'>".'<a href=' .get_author_posts_url(get_the_author_meta('ID')).'">'.get_avatar(get_the_author_meta('ID'),65).'</a>'."</div>";
-                            }
-                        echo "</div>";
+                                echo"<div class='author-gravatar'>".'<a href=' .get_author_posts_url(get_the_author_meta('ID')).'">'.get_avatar(get_the_author_meta('ID'),65).'</a>'."</div>";
+                            echo "</div>";
+                        }                        
                     }         
+                    if($instance['post-date']||$instance['post-author']){
+                        echo"</div>";
+                    }
+                    if($instance['post-category']||$instance['comments']||$instance['views']){
+                        echo"<div class='post-stats'>";
+                    }
                     if ($instance['post-category']){
                         echo"<div class='post-category'>";
                             echo "<h4>Post Category: </h4>";
@@ -147,9 +151,11 @@ class Post_Stats_Counter extends WP_Widget {
                             show_views();
                         echo"</div>";
                     }
+                    if($instance['post-category']||$instance['comments']||$instance['views']){
+                        echo"</div>";
+                    }
                     if ($instance['post-excerpt']){
                         echo"<div class='post-excerpt'>";
-                            echo"<h4> Post Excerpt </h4>";
                             echo "<p>";
                             the_excerpt();
                             echo"</p>";                  
@@ -159,48 +165,52 @@ class Post_Stats_Counter extends WP_Widget {
             endwhile;
          }
          else {
-            $args = array(
+            $arg = array(
                 'author'=>$author_id,
                 "posts_per_page" => $post_count,
                 "post_type" => "post",
-                "meta_key"=>"asc_views",
                 "post_status" => "publish",
+                "meta_key" => "wp_views",
                 "order_by"=>"meta_value_num",
                 "order" => "DESC"
             );
-            $asc_list = new WP_Query($args);
-            if($asc_list->have_posts()) { echo "<ul class='list'>"; }
+            $asc_list = new WP_Query($arg);
+            if($asc_list->have_posts()) { echo "<ul class='awp-list'>"; }
                 while ( $asc_list->have_posts() ) : $asc_list->the_post();                             
                     echo '<li><h4 class="post-title"><a href="'.get_permalink().'">'.the_title('', '', false)."</h4>";
                         if($instance['featured-image']){
                             echo"<div class='featured-image'>";
-                                if (has_post_thumbnail()){
-                                    the_post_thumbnail('featured-thumb');
-                                }
-                                else{
-                                    echo '<img src="';
-                                    echo catch_that_image();
-                                    echo '"alt="Image Not Found"';
-                                    echo the_title();
-                                    echo '/>';
-                                }
+                            if(has_post_thumbnail())
+                                        the_post_thumbnail();
+                                    else {
+                                        echo "No image found";
+                                    }
                             echo "</div>";
                         }
                         echo '</a>';
-                        if ($instance['post-date']){
-                            echo"<div class='post-date'>";
-                                echo"<p>Posted On:";
-                                echo get_the_date();
-                                echo"</p></div>";
-                        }            
-                        if(function_exists("display_post_author_name")){
-                            echo "<div class = 'post-by'><p>";
+                        if($instance['post-date']||$instance['post-author']){
+                            echo "<div class='author-meta'>";
+                        }
+                            if ($instance['post-date']){
+                                echo"<div class='post-date'>";
+                                    echo"<p>Posted On: ";
+                                    echo get_the_date();
+                                    echo"</p></div>";
+                            }            
+                            if(function_exists("display_post_author_name")){                            
                                 if($instance['post-author']){
-                                    display_post_author_name();
-                                    echo"<div class='author-gravatar'>".'<a href=' .get_author_posts_url(get_the_author_meta('ID')).'">'.get_avatar(get_the_author_meta('ID'),65).'</a>'."</div>";
-                                }
-                            echo "</p></div>";
-                        }            
+                                    echo "<div class = 'post-by'><p>";
+                                        display_post_author_name();
+                                        echo"<div class='author-gravatar'>".'<a href=' .get_author_posts_url(get_the_author_meta('ID')).'">'.get_avatar(get_the_author_meta('ID'),65).'</a>'."</div>";
+                                    echo "</p></div>";
+                                }                            
+                            }     
+                        if($instance['post-date']||$instance['post-author']){
+                            echo"</div>";                         
+                        }
+                        if($instance['post-category']||$instance['comments']||$instance['views']){
+                            echo"<div class='post-stats'>";
+                        }
                         if ($instance['post-category']){
                             echo"<div class='post-category'>";
                                 echo "<h4>Post Category: </h4>";
@@ -218,18 +228,18 @@ class Post_Stats_Counter extends WP_Widget {
                                 show_views();
                             echo"</div>";
                         }
+                        if($instance['post-category']||$instance['comments']||$instance['views']){
+                            echo"</div>";
+                        }
                         if ($instance['post-excerpt']){
-                            echo"<div class='post-excerpt line-space'>";
-                                echo"<h4> Post Excerpt </h4>";
-                                echo "<p>";
+                            echo"<div class='post-excerpt'>";
                                 the_excerpt();
-                                echo"</p>";                  
                             echo"</div>";
                         }
                     echo"</li>";
                 endwhile;
            echo "</ul>";
          }        
-         echo"</div>";
+         echo $args['after_widget'];
     }
 }

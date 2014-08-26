@@ -1,9 +1,9 @@
 <?php
 class Recent_Comments extends WP_Widget {
     function __construct() {
-        $widget_ops = array('classname' => 'my_widget_class', 'description' => __('Insert the plugin description here'));
-	$control_ops = array('width' => 300, 'height' => 300);
-	parent::WP_Widget(false, $name = __('Recent_Comments'), $widget_ops, $control_ops );
+        $widget_ops = array('classname' => 'my_widget_class', 'description' => __('Widget to display recent comments.'));
+	$control_ops = array('width' => 200, 'height' => 250);
+	parent::WP_Widget(false, $name = __('Recent Comments'), $widget_ops, $control_ops );
 	$this->alt_option_name = 'widget_recent_comments';
 	if ( is_active_widget(false, false, $this->id_base) )
             add_action( 'wp_head', array($this, 'recent_comments_style') );
@@ -20,8 +20,7 @@ class Recent_Comments extends WP_Widget {
             <?php
 	}
 	function widget( $args, $instance ) {
-		global $comments, $comment,$image,$com;
-		echo '<div class="comments">';                 
+		global $comments, $comment,$image,$com;                 
  		extract($args, EXTR_SKIP);
  		$output = '';                
 		$title = ( ! empty( $instance['title'] ) ) ? $instance['title'] : __( 'Recent Comments' );                
@@ -49,14 +48,13 @@ class Recent_Comments extends WP_Widget {
                                  $id = get_comment($comm);
                                  $image=get_avatar($id,'32');                                  
                              }                            
-                            $output .=  '<li class="recentcomments"><div class="post-comment">' .sprintf(_x('%1$s on %2$s  %3$s %4$s', 'widgets'), get_comment_author_link(), '<a href="' . esc_url( get_comment_link($comment->comment_ID) ) . '">' . $posttitle . '</a></div>' ,'<div class="post-comm-avatar">'.$image .'</div>','<div class="text line-space">'.$com.'</div>') . '</li>';                                
+                            $output .=  '<li class="recentcomments"><div class="post-comment">' .sprintf(_x('%1$s on %2$s  %3$s %4$s', 'widgets'), get_comment_author_link(), '<a href="' . esc_url( get_comment_link($comment->comment_ID) ) . '">' . $posttitle . '</a></div>' ,'<div class="post-comm-avatar">'.$image .'</div>','<div class="comment-text">'.$com.'</div>') . '</li>';
 			}
  		}
 		$output .= $after_widget;
 		echo $output;
 		$cache[$args['widget_id']] = $output;
 		wp_cache_set('widget_recent_comments', $cache, 'widget');
-                echo "</div>";
 	}        
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
@@ -70,7 +68,7 @@ class Recent_Comments extends WP_Widget {
 		return $instance;
 	}
 	function form( $instance ) {
-                $defaults=array('title'=>'Recent Comments','show_comment'=>'0','number'=>__('5'),'show_gravatar'=>'0');
+                $defaults=array('title'=>'Recent Comments','show_comment'=>'0','number'=>'5','show_gravatar'=>'0');
         	$instance = wp_parse_args( (array) $instance, $defaults );                 
 		$title  = isset( $instance['title'] ) ? esc_attr( $instance['title'] ) : '';
 		$number = isset( $instance['number'] ) ? absint( $instance['number'] ) : 5;

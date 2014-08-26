@@ -3,7 +3,7 @@ class Author_List extends WP_Widget {
 	// Controller
 	function __construct() {
             $widget_ops = array('classname' => 'author_list', 'description' => __('Displays author list'));
-            $control_ops = array('width' => 300, 'height' => 300);
+            $control_ops = array('width' => 200, 'height' => 250);
             parent::WP_Widget(false, $name = __('Author List'), $widget_ops, $control_ops );
         }
         function form($instance) { 
@@ -51,11 +51,11 @@ class Author_List extends WP_Widget {
     function widget($args, $instance) {
         $title = apply_filters('widget_title', $instance['title']);
         // Display the widget title
-        echo "<div class='auth-wid widget'>";
+        echo $args['before_widget'];
             if ( $title ){
-                echo "<h3 class='widget-title'>".$title."</h3>";
+                echo $args['before_title'].$title.$args['after_title'];
             }              
             ab_get_author_list($instance['noauth'],$instance['exc']);	
-            echo "</div>";
+            echo $args['after_widget'];
     }
 }

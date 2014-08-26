@@ -16,22 +16,23 @@ function widplg_enqueue_style(){
    wp_enqueue_style( 'style',plugins_url( 'style.css', __FILE__ ) );
 }
 add_action('wp_enqueue_scripts', 'widplg_enqueue_style');
+add_action('wp_head', 'wp_add_view');
 function ab_get_author_list($noauth,$exc){
     echo "<ul>";
     wp_list_authors(array('number'=>$noauth,'exclude'=>$exc));
     echo "</ul>";
 }
 function catch_that_image() {
-  		global $post;
+  		global $post, $posts;
   		$first_img = '';
+                $matches[1][0] = ''; 
   		ob_start();
   		ob_end_clean();
-  		$output = preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $post->post_content, $matches);
-  		$first_img = $matches [1] [0];
-
+  		if($output = preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $post->post_content, $matches)) {
+                    $first_img = $matches[1][0];
+                }
   		if(empty($first_img)){ //Defines a default image
-  			$first_img = bloginfo('template_directory');
-    		$first_img .= "http://picbook.in/wp-content/uploads/2014/07/puppy_images_in_hd.jpg";
+                    $first_img= "http://www.hdwallpapersfootball.com/wp-content/uploads/2014/06/Manchester-United-FC-Logo-HD-Wallpaper.jpg";                    
   		}
   		return $first_img;
 }
@@ -39,17 +40,14 @@ function display_featured_image(){
     global $post;
     $post_id=$post->ID;
     if ( has_post_thumbnail($post_id) ) {
-            the_post_thumbnail(array(100,100));
-        }
-        else {
-            echo '<img src="';
-            echo catch_that_image();
-            echo '" alt="Unable to load" width="100px" height="100px" class="featuredImage" />';
-        }    
+        the_post_thumbnail('featured-thumb');
+    }
+    else {
+       // echo '<img src="'.catch_that_image().'"alt="sorry could not load the image/>';
+    }    
 }
 function display_post_author_name(){
     global $post;
-    echo "<strong>Author:  </strong>";
     $author_id= $post->post_author;
     echo get_the_author_meta('first_name',$author_id);
     echo " ";
@@ -60,20 +58,37 @@ function display_author_description($post_id=0){
         $auth_id=$post->post_author;
         echo get_the_author_meta( 'description', $auth_id);
 }
+function wp_add_view(){
+    if(is_single()){
+        global $post;    
+        $current_views=get_post_meta($post->ID, "wp_views", true);
+        if(!isset($current_views) OR empty($current_views) OR !is_numeric($current_views) ) {
+            $current_views = 0;
+        }
+        $new_views = $current_views + 1;
+        update_post_meta($post->ID, "wp_views", $new_views);
+        return $new_views;
+    }
+}
+function wp_get_view_count() {
+    global $post;            
+    $current_views = get_post_meta($post->ID, "wp_views", true);
+    if(!isset($current_views) OR empty($current_views) OR !is_numeric($current_views) ) {
+        $current_views = 0;
+    }
+    return $current_views;
+}
 function show_views($singular = "view", $plural = "views", $before = "This post has: ") {
     global $post;
-    
-    echo"<div class='post-views'>";
-        $current_views = get_post_meta($post->ID, "wp_views", true);  
-        $views_text = $before . $current_views . " ";
-        if ($current_views == 1) {
-            $views_text .= $singular;
-        }
-        else {
-            $views_text .= $plural;
-        }
-        echo $views_text;
-    echo"</div>";
+    $current_views = get_post_meta($post->ID, "wp_views", true);  
+    $views_text = $before . $current_views . " ";
+    if ($current_views == 1) {
+        $views_text .= $singular;
+    }
+    else {
+        $views_text .= $plural;
+    }
+    echo $views_text;
 }
 function custom_excerpt_length( $length ) {
 	return 15;
@@ -93,6 +108,6 @@ include 'author_bio_widget.php';
 add_action('widgets_init',create_function('', 'return register_widget("Recent_Comments");'));
 add_action('widgets_init',create_function('', 'return register_widget("Featured_Posts");'));
 add_action('widgets_init',create_function('', 'return register_widget("Post_Stats_Counter");'));
-add_action('widgets_init',create_function('', 'return register_widget("wp_recent_posts");'));
+add_action('widgets_init',create_function('', 'return register_widget("awp_recent_posts");'));
 add_action('widgets_init',create_function('', 'return register_widget("Author_List");'));
 add_action('widgets_init',create_function('', 'return register_widget("Author_Bio");'));

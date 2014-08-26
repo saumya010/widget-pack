@@ -30,27 +30,25 @@ class Author_Bio extends WP_Widget {
     function widget($args, $instance) {
         extract ($args);
         $instance = wp_parse_args((array) $instance, $this->defaults); 
-        echo $before_widget;
-        echo "<div class='author_bio'>";
-            if ( $instance['title'] ){
-                echo "<h3 class='widget-title'>".$instance['title']."</h3>";
-            }
+        echo $before_widget;        
+            //echo $args['before_widget'];
+            if ( $instance['title']){
+                echo $args['before_title'] .$instance['title']. $args['after_title'];}
             $text='';
             if($instance['alignment']){
-		$text .= '<span class="align' . esc_attr( $instance['alignment'] ) . '">';
+		$text .= '<span class="auth-grav align' . esc_attr( $instance['alignment'] ) . '">';
             }
             $text.=get_avatar($instance['user'],$instance['size']);
             if($instance['alignment'])
                 $text.='</span>';
             if($instance['sort_radiobox']=="bio")
-                $text.="<div class='details'>Description: ".get_the_author_meta('description',$instance['user']);
+                $text.="<div class='details'><p>".get_the_author_meta('description',$instance['user'])."</p>";
             else
-                $text.="Description: ".$instance['text-bio'];
+                $text.="<p>".$instance['text-bio']."</p>";
             $text .= $instance['page'] ? sprintf( ' <a class="pagelink" href="%s">%s</a>', get_page_link( $instance['page'] ), $instance['page_link_text'] ) : '';
             echo wpautop($text);
             if ( $instance['posts_link'] )
-		printf( '<div class="posts-link"><a href="%s">%s</a></div>', get_author_posts_url( $instance['user'] ), __( 'View My Blog Posts', 'genesis' ) );
-            echo "</div>";
+		printf( '<div class="posts-link"><a href="%s">%s</a></div>', get_author_posts_url( $instance['user'] ), __( 'View My Blog Posts', 'genesis' ) );           
             echo $after_widget;                      
     }
     function form($instance) {
